@@ -204,6 +204,7 @@ class EvidenceORM(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
     finding_id: Mapped[str] = mapped_column(ForeignKey("findings.id"), nullable=False)
     type: Mapped[str] = mapped_column(String, nullable=False)
+    content_text: Mapped[str | None] = mapped_column(Text)
     storage_path: Mapped[str | None] = mapped_column(String)
     sha256: Mapped[str | None] = mapped_column(String)
     caption: Mapped[str | None] = mapped_column(Text)

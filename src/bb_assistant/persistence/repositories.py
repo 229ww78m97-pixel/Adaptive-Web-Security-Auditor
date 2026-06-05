@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from bb_assistant.persistence.models import (
     AuthorizationORM,
     CheckResultORM,
+    EvidenceORM,
     FindingORM,
     ProgramORM,
     RequestLogORM,
@@ -135,3 +136,18 @@ class FindingRepository:
             FindingORM.human_verified.is_(True),
         )
         return list(self._session.scalars(statement.order_by(FindingORM.created_at)))
+
+
+class EvidenceRepository:
+    def __init__(self, session: Session) -> None:
+        self._session = session
+
+    def create(self, evidence: EvidenceORM) -> EvidenceORM:
+        self._session.add(evidence)
+        self._session.commit()
+        self._session.refresh(evidence)
+        return evidence
+
+    def list_for_finding(self, finding_id: str) -> list[EvidenceORM]:
+        statement = select(EvidenceORM).where(EvidenceORM.finding_id == finding_id)
+        return list(self._session.scalars(statement.order_by(EvidenceORM.created_at)))

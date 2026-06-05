@@ -21,6 +21,7 @@ from bb_assistant.core.checks.robots_txt import RobotsTxtCheck
 from bb_assistant.core.checks.security_headers import SecurityHeadersCheck
 from bb_assistant.core.checks.security_txt import SecurityTxtCheck
 from bb_assistant.core.checks.tls_basics import TLSBasicsCheck
+from bb_assistant.core.evidence import EvidenceValidationError, create_evidence_note
 from bb_assistant.core.findings import (
     FindingDraftNotAllowedError,
     create_finding_draft_from_check_result,
@@ -38,6 +39,8 @@ from bb_assistant.interfaces.ui_helpers import (
     check_result_from_orm,
     check_result_to_orm,
     ensure_local_dirs,
+    evidence_item_to_orm,
+    evidence_notes_as_markdown,
     finding_to_orm,
     scope_rules_from_orm,
     verify_finding_orm,
@@ -55,6 +58,7 @@ from bb_assistant.persistence.models import (
 from bb_assistant.persistence.repositories import (
     AuthorizationRepository,
     CheckResultRepository,
+    EvidenceRepository,
     FindingRepository,
     ProgramRepository,
     ScopeRepository,
@@ -324,6 +328,7 @@ def render_findings(session: Session) -> None:
     target_by_id = {target.id: target for target in targets}
     result_repository = CheckResultRepository(session)
     finding_repository = FindingRepository(session)
+    evidence_repository = EvidenceRepository(session)
 
     st.subheader("Check Results")
     for target in targets:
@@ -347,6 +352,7 @@ def render_findings(session: Session) -> None:
             st.write(f"Severity: {finding.severity}")
             st.write(f"Human verified: {finding.human_verified}")
             st.write(finding.description)
+            render_evidence_section(session, evidence_repository, finding)
             if not finding.human_verified:
                 render_verify_finding_form(session, finding)
 
@@ -367,10 +373,12 @@ def render_reports(session: Session) -> None:
         return
 
     generator = ReportGenerator(TEMPLATE_DIR)
+    evidence_items = EvidenceRepository(session).list_for_finding(finding.id)
     context = {
         "program_name": program.name,
         "asset": finding.affected_url,
         "scope_proof": "Human verified as authorized and in scope before report generation.",
+        "evidence": evidence_notes_as_markdown(evidence_items),
     }
     try:
         technical = generator.render_technical_report(finding, context=context)
@@ -487,6 +495,45 @@ def create_finding_draft(
     FindingRepository(session).create(finding_to_orm(finding))
     st.success("Finding draft created.")
     st.rerun()
+
+
+def render_evidence_section(
+    session: Session,
+    evidence_repository: EvidenceRepository,
+    finding: FindingORM,
+) -> None:
+    st.markdown("#### Evidence")
+    evidence_items = evidence_repository.list_for_finding(finding.id)
+    if evidence_items:
+        for item in evidence_items:
+            label = item.caption or item.type
+            st.write(f"{item.type}: {label}")
+            if item.content_text:
+                st.code(item.content_text)
+            if item.request_log_id:
+                st.caption(f"RequestLog reference: {item.request_log_id}")
+    else:
+        st.info("No evidence attached yet.")
+
+    with st.form(f"evidence-note-{finding.id}"):
+        caption = st.text_input("Evidence caption")
+        text = st.text_area("Evidence note")
+        submitted = st.form_submit_button("Add Evidence Note")
+
+    if submitted:
+        try:
+            evidence = create_evidence_note(
+                finding_id=finding.id,
+                text=text,
+                caption=caption or None,
+            )
+        except EvidenceValidationError as error:
+            st.error(str(error))
+            return
+        evidence_repository.create(evidence_item_to_orm(evidence))
+        session.commit()
+        st.success("Evidence note added with redaction.")
+        st.rerun()
 
 
 def render_verify_finding_form(session: Session, finding: FindingORM) -> None:

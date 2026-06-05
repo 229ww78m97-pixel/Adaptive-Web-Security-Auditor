@@ -7,8 +7,9 @@ from pathlib import Path
 from typing import Any
 
 from bb_assistant.core.checks.base import CheckResult, CheckStatus
+from bb_assistant.core.evidence import EvidenceItem
 from bb_assistant.core.models import AssetType, Finding, FindingStatus, ScopeRule, Severity
-from bb_assistant.persistence.models import CheckResultORM, FindingORM, ScopeRuleORM
+from bb_assistant.persistence.models import CheckResultORM, EvidenceORM, FindingORM, ScopeRuleORM
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "bb_assistant.sqlite3"
@@ -87,6 +88,36 @@ def finding_to_orm(finding: Finding) -> FindingORM:
         status=finding.status.value,
         human_verified=finding.human_verified,
     )
+
+
+def evidence_item_to_orm(evidence: EvidenceItem) -> EvidenceORM:
+    return EvidenceORM(
+        finding_id=evidence.finding_id,
+        type=evidence.type,
+        content_text=evidence.content_text,
+        caption=evidence.caption,
+        sha256=evidence.sha256,
+        request_log_id=evidence.request_log_id,
+        storage_path=evidence.storage_path,
+    )
+
+
+def evidence_notes_as_markdown(evidence_items: list[EvidenceORM]) -> str:
+    notes = [item for item in evidence_items if item.type == "note" and item.content_text]
+    if not notes:
+        return "Evidence should be reviewed and attached by the researcher."
+
+    lines: list[str] = []
+    for index, item in enumerate(notes, start=1):
+        title = item.caption or f"Evidence note {index}"
+        lines.append(f"### {title}")
+        lines.append("")
+        lines.append(item.content_text or "")
+        if item.sha256:
+            lines.append("")
+            lines.append(f"SHA256: `{item.sha256}`")
+        lines.append("")
+    return "\n".join(lines).strip()
 
 
 def verify_finding_orm(

@@ -51,6 +51,8 @@ It intentionally does not include:
 - Per-host rate limiter
 - Passive checks for headers, CORS/CSP observations, cookie flags,
   `security.txt`, `robots.txt`, and basic HTTPS usage
+- Passive technology profiler for coarse environment hints from response
+  headers and visible HTML only
 - SQLite persistence with SQLAlchemy 2.x
 - Finding draft workflow with explicit human verification
 - Jinja2 Markdown report generation
@@ -98,7 +100,7 @@ python -m pytest
 Current local status:
 
 ```text
-92 passed
+111 passed
 ```
 
 ## Start Streamlit UI
@@ -127,6 +129,10 @@ Redirect targets are validated against scope before they are followed.
 The v0.2 CORS and CSP analyzers are passive header observations only. They do
 not perform origin reflection testing, bypass testing, payload testing, login
 tests, or other active validation.
+
+The passive technology profiler only classifies already observed headers, URLs,
+status metadata, and visible HTML hints. It does not crawl, enumerate
+subdomains, match CVEs, test logins, or create Findings.
 
 ## Reporting
 

@@ -53,6 +53,7 @@ It intentionally does not include:
   `security.txt`, `robots.txt`, and basic HTTPS usage
 - Passive technology profiler for coarse environment hints from response
   headers and visible HTML only
+- Rule-based checklist engine for non-executable human review tasks
 - SQLite persistence with SQLAlchemy 2.x
 - Finding draft workflow with explicit human verification
 - Jinja2 Markdown report generation
@@ -100,7 +101,7 @@ python -m pytest
 Current local status:
 
 ```text
-111 passed
+128 passed
 ```
 
 ## Start Streamlit UI
@@ -134,6 +135,10 @@ The passive technology profiler only classifies already observed headers, URLs,
 status metadata, and visible HTML hints. It does not crawl, enumerate
 subdomains, match CVEs, test logins, or create Findings.
 
+The v0.2 checklist engine turns passive profile tags into human-in-the-loop
+review tasks. Checklist items are never auto-executable and riskier topics are
+marked as `explicit_permission_required`.
+
 ## Reporting
 
 CheckResults are not Findings. They are observations.
@@ -150,6 +155,7 @@ program policy, applicable law, and rate limits.
 ## Roadmap
 
 - Additional passive analyzers with conservative manual-review hints
+- Streamlit display for generated manual checklists
 - Richer report export options
 - Program import/export
 - Better review workflow for evidence

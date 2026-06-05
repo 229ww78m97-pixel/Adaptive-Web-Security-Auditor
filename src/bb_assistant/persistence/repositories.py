@@ -11,6 +11,7 @@ from bb_assistant.persistence.models import (
     EvidenceORM,
     FindingORM,
     ProgramORM,
+    ReportORM,
     RequestLogORM,
     ScopeRuleORM,
     TargetORM,
@@ -59,6 +60,9 @@ class TargetRepository:
         self._session.refresh(target)
         return target
 
+    def get_by_id(self, target_id: str) -> TargetORM | None:
+        return self._session.get(TargetORM, target_id)
+
     def list_for_program(self, program_id: str) -> list[TargetORM]:
         statement = select(TargetORM).where(TargetORM.program_id == program_id)
         return list(self._session.scalars(statement.order_by(TargetORM.host)))
@@ -81,6 +85,10 @@ class AuthorizationRepository:
             .order_by(AuthorizationORM.confirmed_at.desc())
         )
         return self._session.scalars(statement).first()
+
+    def list_for_program(self, program_id: str) -> list[AuthorizationORM]:
+        statement = select(AuthorizationORM).where(AuthorizationORM.program_id == program_id)
+        return list(self._session.scalars(statement.order_by(AuthorizationORM.confirmed_at)))
 
 
 class RequestLogRepository:
@@ -151,3 +159,18 @@ class EvidenceRepository:
     def list_for_finding(self, finding_id: str) -> list[EvidenceORM]:
         statement = select(EvidenceORM).where(EvidenceORM.finding_id == finding_id)
         return list(self._session.scalars(statement.order_by(EvidenceORM.created_at)))
+
+
+class ReportRepository:
+    def __init__(self, session: Session) -> None:
+        self._session = session
+
+    def create(self, report: ReportORM) -> ReportORM:
+        self._session.add(report)
+        self._session.commit()
+        self._session.refresh(report)
+        return report
+
+    def list_for_finding(self, finding_id: str) -> list[ReportORM]:
+        statement = select(ReportORM).where(ReportORM.finding_id == finding_id)
+        return list(self._session.scalars(statement.order_by(ReportORM.created_at)))

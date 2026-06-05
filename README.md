@@ -57,6 +57,7 @@ It intentionally does not include:
 - SQLite persistence with SQLAlchemy 2.x
 - Finding draft workflow with explicit human verification
 - Jinja2 Markdown report generation
+- Redacted Markdown/JSON audit-trail export for local documentation
 - Minimal Streamlit UI for the end-to-end workflow
 - Local deterministic test suite
 
@@ -101,7 +102,7 @@ python -m pytest
 Current local status:
 
 ```text
-128 passed
+137 passed
 ```
 
 ## Start Streamlit UI
@@ -146,6 +147,11 @@ CheckResults are not Findings. They are observations.
 Only findings with `human_verified=True` are reportable. The report generator
 will block unverified findings with `ReportNotAllowedError`.
 
+Audit-trail exports document local program context, scope, authorization,
+targets, request logs, check results, findings, evidence, and reports. They are
+redacted Markdown/JSON documentation only: they do not create findings, run
+checks, or submit anything to a platform.
+
 ## Legal Notice
 
 Use this project only for authorized security research and bug bounty programs
@@ -157,6 +163,6 @@ program policy, applicable law, and rate limits.
 - Additional passive analyzers with conservative manual-review hints
 - Streamlit display for generated manual checklists
 - Richer report export options
-- Program import/export
+- Program and target audit export workflows
 - Better review workflow for evidence
 - Optional Alembic migrations when schema changes become frequent

@@ -1,0 +1,19 @@
+.DS_Store
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Local app state
+data/*.sqlite3
+data/*.sqlite3-*
+reports/*.md
+.streamlit/secrets.toml
+

@@ -1,0 +1,1 @@
+"""Passive check implementations."""

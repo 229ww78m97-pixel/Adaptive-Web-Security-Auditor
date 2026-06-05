@@ -1,0 +1,50 @@
+# {{ finding.title }}
+
+## Program
+
+{{ program_name | default(finding.program_id, true) }}
+
+## Asset
+
+{{ asset | default(finding.target_id, true) }}
+
+## Scope Proof
+
+{{ scope_proof | default("Human verified as in scope before report generation.", true) }}
+
+## Summary
+
+{{ finding.description }}
+
+## Affected Endpoint
+
+{{ finding.affected_url }}
+
+## Vulnerability Type
+
+{{ finding.finding_type }}
+
+## Severity
+
+{{ finding.severity }}
+
+## Steps to Reproduce
+
+{{ finding.steps_to_reproduce }}
+
+## Evidence
+
+{{ evidence | default("Evidence should be reviewed and attached by the researcher.", true) }}
+
+## Impact
+
+{{ finding.impact }}
+
+## Recommendation
+
+{{ finding.recommendation }}
+
+## Notes
+
+{{ notes | default("This report was generated from a human-verified finding.", true) }}
+

@@ -1,0 +1,26 @@
+# Management Summary
+
+## Finding
+
+{{ finding.title }}
+
+## Severity
+
+{{ finding.severity }}
+
+## Affected System
+
+{{ affected_system | default(finding.affected_url, true) }}
+
+## Business Impact
+
+{{ business_impact | default(finding.impact, true) }}
+
+## Recommended Action
+
+{{ recommended_action | default(finding.recommendation, true) }}
+
+## Status
+
+{{ finding.status }}
+

@@ -49,8 +49,8 @@ It intentionally does not include:
 - Safe HTTP Client with safe mode default
 - GET and HEAD only in safe mode
 - Per-host rate limiter
-- Passive checks for headers, cookie flags, `security.txt`, `robots.txt`, and
-  basic HTTPS usage
+- Passive checks for headers, CORS/CSP observations, cookie flags,
+  `security.txt`, `robots.txt`, and basic HTTPS usage
 - SQLite persistence with SQLAlchemy 2.x
 - Finding draft workflow with explicit human verification
 - Jinja2 Markdown report generation
@@ -98,7 +98,7 @@ python -m pytest
 Current local status:
 
 ```text
-64 passed
+92 passed
 ```
 
 ## Start Streamlit UI
@@ -124,6 +124,10 @@ allowed. All outbound requests go through:
 
 Redirect targets are validated against scope before they are followed.
 
+The v0.2 CORS and CSP analyzers are passive header observations only. They do
+not perform origin reflection testing, bypass testing, payload testing, login
+tests, or other active validation.
+
 ## Reporting
 
 CheckResults are not Findings. They are observations.
@@ -139,7 +143,7 @@ program policy, applicable law, and rate limits.
 
 ## Roadmap
 
-- DB-backed request logging in the Streamlit workflow
+- Additional passive analyzers with conservative manual-review hints
 - Richer report export options
 - Program import/export
 - Better review workflow for evidence

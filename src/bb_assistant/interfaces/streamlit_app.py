@@ -17,6 +17,8 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from bb_assistant.core.checks.cookies import CookieFlagsCheck
+from bb_assistant.core.checks.cors import CorsHeadersCheck
+from bb_assistant.core.checks.csp import ContentSecurityPolicyCheck
 from bb_assistant.core.checks.robots_txt import RobotsTxtCheck
 from bb_assistant.core.checks.security_headers import SecurityHeadersCheck
 from bb_assistant.core.checks.security_txt import SecurityTxtCheck
@@ -68,6 +70,8 @@ from bb_assistant.persistence.repositories import (
 PASSIVE_CHECKS = (
     TLSBasicsCheck(),
     SecurityHeadersCheck(),
+    CorsHeadersCheck(),
+    ContentSecurityPolicyCheck(),
     CookieFlagsCheck(),
     SecurityTxtCheck(),
     RobotsTxtCheck(),

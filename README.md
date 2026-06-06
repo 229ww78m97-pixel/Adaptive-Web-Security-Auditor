@@ -3,8 +3,9 @@
 Bug Bounty Analysis & Findings Assistant.
 
 This project is being built as a legal-by-design, passive-first,
-human-in-the-loop workspace for authorized bug bounty analysis. Version 0.1
-starts with the safety core: domain models, scope validation, and tests.
+human-in-the-loop workspace for authorized bug bounty analysis. Version 0.2.0
+packages the local passive workflow, persistence layer, reporting, and redacted
+audit documentation.
 
 ## What It Is
 
@@ -42,7 +43,7 @@ It intentionally does not include:
 - Data exfiltration
 - Active vulnerability exploitation
 
-## Features
+## Feature Overview
 
 - Default-deny Scope Guard
 - Out-of-scope rule priority
@@ -78,7 +79,7 @@ templates/       Markdown report templates
 tests/           Local deterministic pytest suite
 ```
 
-## Installation
+## Quick Start
 
 ```bash
 cd /Users/michaelbruckner/CS
@@ -93,7 +94,16 @@ On this local macOS setup, Homebrew Python may need:
 DYLD_LIBRARY_PATH=/opt/homebrew/opt/expat/lib
 ```
 
-## Test
+Start the local Streamlit UI:
+
+```bash
+streamlit run src/bb_assistant/interfaces/streamlit_app.py
+```
+
+The UI uses a local SQLite database at `data/bb_assistant.sqlite3` and stores
+generated Markdown reports in `reports/`.
+
+## Run Tests
 
 ```bash
 python -m pytest
@@ -105,18 +115,7 @@ Current local status:
 137 passed
 ```
 
-## Start Streamlit UI
-
-```bash
-cd /Users/michaelbruckner/CS
-source .venv/bin/activate
-streamlit run src/bb_assistant/interfaces/streamlit_app.py
-```
-
-The UI uses a local SQLite database at `data/bb_assistant.sqlite3` and stores
-generated Markdown reports in `reports/`.
-
-## Safe Mode
+## Safety Model
 
 Safe mode is enabled by default. In safe mode, only `GET` and `HEAD` requests are
 allowed. All outbound requests go through:
@@ -152,17 +151,32 @@ targets, request logs, check results, findings, evidence, and reports. They are
 redacted Markdown/JSON documentation only: they do not create findings, run
 checks, or submit anything to a platform.
 
+## Current Limitations
+
+- The Streamlit UI is intentionally minimal and local-first.
+- There is no bug bounty platform API integration.
+- Passive checks do not prove exploitability.
+- CORS and CSP analyzers do not perform bypass testing or Origin manipulation.
+- The technology profiler does not crawl, enumerate subdomains, match CVEs, or
+  test logins.
+- Schema migrations are not yet managed with Alembic.
+
+## Documentation
+
+- [Changelog](CHANGELOG.md)
+- [v0.2.0 release notes](docs/release-v0.2.md)
+- [Screenshot placeholders](docs/screenshots.md)
+
 ## Legal Notice
 
 Use this project only for authorized security research and bug bounty programs
 where you have permission to test the target. You are responsible for following
 program policy, applicable law, and rate limits.
 
-## Roadmap
+## Roadmap v0.3
 
-- Additional passive analyzers with conservative manual-review hints
-- Streamlit display for generated manual checklists
-- Richer report export options
-- Program and target audit export workflows
-- Better review workflow for evidence
-- Optional Alembic migrations when schema changes become frequent
+- Improve review workflows around CheckResults, Evidence, Findings, and Reports
+- Add richer local filtering and export controls
+- Improve Streamlit ergonomics while keeping Safe Mode as the default
+- Add optional Alembic migrations if schema changes continue
+- Expand passive documentation helpers without adding active testing behavior

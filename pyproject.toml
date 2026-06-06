@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bb-assistant"
-version = "0.1.0"
+version = "0.2.0"
 description = "Passive-first Bug Bounty Analysis & Findings Assistant"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -50,4 +50,3 @@ python_version = "3.12"
 strict = true
 mypy_path = "src"
 packages = ["bb_assistant"]
-
